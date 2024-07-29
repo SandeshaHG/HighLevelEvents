@@ -17,9 +17,21 @@ const userTimeZone = (date, timezone) => {
   return utcDate.tz(timezone).format();
 };
 
+const slotExists = (current, existingSlots, slotDuration) => {
+  const currentEnd = moment(current).add(slotDuration, "minutes");
+  return existingSlots.some((slot) => {
+    const slotStart = moment(slot.timestamp);
+    const slotEnd = moment(slot.timestamp).add(slot.duration, "minutes");
+
+    return (
+      current.isBetween(slotStart, slotEnd, null, "[)") ||
+      currentEnd.isBetween(slotStart, slotEnd, null, "(]")
+    );
+  });
+};
+
 const getSlots = (date, timezone, existingSlots = []) => {
   const slotDuration = config.DURATION;
-  const durationMinutes = slotDuration * 60;
 
   const [userStartDate, userEndDate] = getConfigUTC(date);
 
@@ -27,24 +39,15 @@ const getSlots = (date, timezone, existingSlots = []) => {
   let current = moment(userStartDate);
 
   while (current < userEndDate) {
-    const currentEnd = moment(current).add(durationMinutes, "minutes");
-    const isBooked = existingSlots.some((slot) => {
-      const slotStart = moment(slot.timestamp);
-      const slotEnd = moment(slot.timestamp).add(slot.duration, "minutes");
-
-      return (
-        current.isBetween(slotStart, slotEnd, null, "[)") ||
-        currentEnd.isBetween(slotStart, slotEnd, null, "(]")
-      );
-    });
+    const isBooked = slotExists(current, existingSlots, slotDuration);
 
     if (!isBooked) {
       slots.push(current.tz(timezone).format("YYYY-MM-DD HH:mm"));
     }
-    current.add(durationMinutes, "minutes");
+    current.add(slotDuration, "minutes");
   }
 
   return slots;
 };
 
-module.exports = { getConfigUTC, getSlots, userTimeZone };
+module.exports = { getConfigUTC, getSlots, userTimeZone, slotExists };

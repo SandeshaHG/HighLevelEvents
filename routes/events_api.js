@@ -1,12 +1,14 @@
 const express = require("express");
 const router = express.Router();
-const { addEvent, getEvents } = require("../firebase_config");
+
+const config = require("../config");
+const { getEvents } = require("../firebase_config");
+const { getSlots } = require("../utils/utils");
 
 router.get("/", (req, res) => {
   res.send("Get ready to book an appointment with Dr John");
 });
 
-const config = require("../config");
 router.get("/config", (req, res) => {
   res.json({
     startHours: config.START_HOURS,
@@ -16,12 +18,10 @@ router.get("/config", (req, res) => {
   });
 });
 
-const { getSlots } = require("../utils/utils");
 router.get("/free_slots", async (req, res) => {
   const { date, timezone } = req.query;
   const existingSlots = await getEvents();
   const slots = getSlots(date, timezone, existingSlots);
-
   res.json(slots);
 });
 

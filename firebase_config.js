@@ -20,13 +20,13 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-async function addEvent(timestamp, duration) {
+async function addEvent(date, timestamp, duration) {
   try {
-    const docRef = await addDoc(collection(db, "events"), {
+    await addDoc(collection(db, "events"), {
+      id: date,
       timestamp: timestamp,
       duration: duration,
     });
-    console.log("Document written with ID: ", docRef.id);
   } catch (e) {
     console.error("Error adding document: ", e);
   }

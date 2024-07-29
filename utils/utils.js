@@ -50,4 +50,22 @@ const getSlots = (date, timezone, existingSlots = []) => {
   return slots;
 };
 
-module.exports = { getConfigUTC, getSlots, userTimeZone, slotExists };
+const formattedDates = (data) => {
+  return data.map((item) => {
+    return {
+      id: item.id,
+      formattedTimestamps: item.timestamp.map((ts) => {
+        const date = new Date(ts.seconds * 1000 + ts.nanoseconds / 1000000);
+        return moment(date).format("YYYY-MM-DD h:mm A");
+      }),
+    };
+  });
+};
+
+module.exports = {
+  getConfigUTC,
+  getSlots,
+  userTimeZone,
+  slotExists,
+  formattedDates,
+};

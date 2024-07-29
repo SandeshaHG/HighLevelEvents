@@ -2,9 +2,11 @@ const { initializeApp } = require("firebase/app");
 const {
   getFirestore,
   collection,
-  addDoc,
+  setDoc,
   getDocs,
   doc,
+  Timestamp,
+  arrayUnion,
 } = require("firebase/firestore");
 
 const firebaseConfig = {
@@ -22,11 +24,13 @@ const db = getFirestore(app);
 
 async function addEvent(date, timestamp, duration) {
   try {
-    await addDoc(collection(db, "events"), {
-      id: date,
-      timestamp: timestamp,
-      duration: duration,
-    });
+    await setDoc(
+      doc(db, "events", date),
+      {
+        timestamp: arrayUnion(Timestamp.fromMillis(timestamp)),
+      },
+      { merge: true }
+    );
   } catch (e) {
     console.error("Error adding document: ", e);
   }
@@ -39,6 +43,7 @@ async function getEvents() {
     snapshot.docs.map((doc) => {
       events.push({ id: doc.id, ...doc.data() });
     });
+    console.log("get events", events);
     return events;
   } catch (e) {
     console.error("Error getting documents: ", e);

@@ -17,7 +17,7 @@ const userTimeZone = (date, timezone) => {
   return utcDate.tz(timezone).format();
 };
 
-const getSlots = (date, timezone) => {
+const getSlots = (date, timezone, existingSlots = []) => {
   const slotDuration = config.DURATION;
   const durationMinutes = slotDuration * 60;
 
@@ -27,7 +27,20 @@ const getSlots = (date, timezone) => {
   let current = moment(userStartDate);
 
   while (current < userEndDate) {
-    slots.push(userTimeZone(current, timezone));
+    const currentEnd = moment(current).add(durationMinutes, "minutes");
+    const isBooked = existingSlots.some((slot) => {
+      const slotStart = moment(slot.timestamp);
+      const slotEnd = moment(slot.timestamp).add(slot.duration, "minutes");
+
+      return (
+        current.isBetween(slotStart, slotEnd, null, "[)") ||
+        currentEnd.isBetween(slotStart, slotEnd, null, "(]")
+      );
+    });
+
+    if (!isBooked) {
+      slots.push(current.tz(timezone).format("YYYY-MM-DD HH:mm"));
+    }
     current.add(durationMinutes, "minutes");
   }
 

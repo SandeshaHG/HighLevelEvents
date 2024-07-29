@@ -1,5 +1,6 @@
 const express = require("express");
 const router = express.Router();
+const { addEvent, getEvents } = require("../firebase_config");
 
 router.get("/", (req, res) => {
   res.send("Get ready to book an appointment with Dr John");
@@ -16,14 +17,12 @@ router.get("/config", (req, res) => {
 });
 
 const { getSlots } = require("../utils/utils");
-router.get("/free_slots", (req, res) => {
+router.get("/free_slots", async (req, res) => {
   const { date, timezone } = req.query;
+  const existingSlots = await getEvents();
+  const slots = getSlots(date, timezone, existingSlots);
 
-  const slots = getSlots(date, timezone);
-
-  res.json({
-    slots: slots,
-  });
+  res.json(slots);
 });
 
 module.exports = router;

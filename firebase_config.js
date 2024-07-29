@@ -22,7 +22,7 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-async function addEvent(date, timestamp, duration) {
+async function addEvent(date, timestamp) {
   try {
     await setDoc(
       doc(db, "events", date),
@@ -43,7 +43,6 @@ async function getEvents() {
     snapshot.docs.map((doc) => {
       events.push({ id: doc.id, ...doc.data() });
     });
-    console.log("get events", events);
     return events;
   } catch (e) {
     console.error("Error getting documents: ", e);

@@ -17,16 +17,26 @@ const userTimeZone = (date, timezone) => {
   return utcDate.tz(timezone).format();
 };
 
-const slotExists = (current, existingSlots, slotDuration) => {
-  const currentEnd = moment(current).add(slotDuration, "minutes");
-  return existingSlots.some((slot) => {
-    const slotStart = moment(slot.timestamp);
-    const slotEnd = moment(slot.timestamp).add(slot.duration, "minutes");
+const toMillis = (timestamp) => {
+  return timestamp.seconds * 1000 + timestamp.nanoseconds / 1000000;
+};
 
-    return (
-      current.isBetween(slotStart, slotEnd, null, "[)") ||
-      currentEnd.isBetween(slotStart, slotEnd, null, "(]")
-    );
+const flattenSlots = (slots) => {
+  return slots.flatMap((slot) => slot.timestamp?.map(toMillis));
+};
+
+const slotExists = (currentTimestamp, existingSlots, slotDuration = 30) => {
+  const currentStart = moment(Number(currentTimestamp));
+  const currentEnd = moment(Number(currentTimestamp)).add(
+    slotDuration,
+    "minutes"
+  );
+  const timestamps = flattenSlots(existingSlots);
+
+  return !timestamps.some((slot) => {
+    const slotStart = moment(slot);
+    const slotEnd = moment(slot).add(30, "minutes");
+    return currentStart.isBefore(slotEnd) && currentEnd.isAfter(slotStart);
   });
 };
 
@@ -34,14 +44,16 @@ const getSlots = (date, timezone, existingSlots = []) => {
   const slotDuration = config.DURATION;
 
   const [userStartDate, userEndDate] = getConfigUTC(date);
-
   const slots = [];
   let current = moment(userStartDate);
-
+  console.log("tim", timezone);
   while (current < userEndDate) {
-    const isBooked = slotExists(current, existingSlots, slotDuration);
-
-    if (!isBooked) {
+    const notBooked = slotExists(
+      current.valueOf(),
+      existingSlots,
+      slotDuration
+    );
+    if (notBooked) {
       slots.push(current.tz(timezone).format("YYYY-MM-DD HH:mm"));
     }
     current.add(slotDuration, "minutes");
@@ -53,8 +65,8 @@ const getSlots = (date, timezone, existingSlots = []) => {
 const formattedDates = (data) => {
   return data.map((item) => {
     return {
-      id: item.id,
-      formattedTimestamps: item.timestamp.map((ts) => {
+      id: item?.id,
+      timestamp: item?.timestamp?.map((ts) => {
         const date = new Date(ts.seconds * 1000 + ts.nanoseconds / 1000000);
         return moment(date).format("YYYY-MM-DD h:mm A");
       }),
@@ -68,4 +80,5 @@ module.exports = {
   userTimeZone,
   slotExists,
   formattedDates,
+  flattenSlots,
 };

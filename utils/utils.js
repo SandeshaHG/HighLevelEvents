@@ -46,13 +46,13 @@ const getSlots = (date, timezone, existingSlots = []) => {
   const [userStartDate, userEndDate] = getConfigUTC(date);
   const slots = [];
   let current = moment(userStartDate);
-  console.log("tim", timezone);
   while (current < userEndDate) {
     const notBooked = slotExists(
       current.valueOf(),
       existingSlots,
       slotDuration
     );
+    console.log("notBooked", notBooked);
     if (notBooked) {
       slots.push(current.tz(timezone).format("YYYY-MM-DD HH:mm"));
     }

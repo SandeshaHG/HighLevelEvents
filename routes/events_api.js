@@ -3,12 +3,7 @@ const router = express.Router();
 const moment = require("moment-timezone");
 const config = require("../config");
 const { getEvents, addEvent } = require("../firebase_config");
-const {
-  getSlots,
-  formattedDates,
-  slotExists,
-  flattenSlots,
-} = require("../utils/utils");
+const { getSlots, formattedDates, slotExists } = require("../utils/utils");
 
 router.get("/", (req, res) => {
   res.send("Get ready to book an appointment with Dr John");
@@ -24,10 +19,29 @@ router.get("/config", (req, res) => {
 });
 
 router.get("/free_slots", async (req, res) => {
-  const { date, timezone } = req.query;
-  const existingSlots = await getEvents();
-  const slots = getSlots(date, timezone, existingSlots);
-  res.json(slots);
+  try {
+    const { date, timezone } = req.query;
+    if (!date || !timezone) {
+      return res.status(400).send("Missing date or timezone parameter");
+    }
+
+    const isValidTimeZone = moment.tz.names().includes(timezone);
+    if (!isValidTimeZone) {
+      return res.status(400).send("Invalid timezone");
+    }
+
+    const isValidDate = moment(date, "YYYY-MM-DD", true).isValid();
+    if (!isValidDate) {
+      return res.status(400).send("Invalid date format. Use YYYY-MM-DD");
+    }
+
+    const existingSlots = await getEvents();
+
+    const slots = getSlots(date, timezone, existingSlots);
+    res.json(slots);
+  } catch (e) {
+    res.status(500).send(`Internal server error | ${e}`);
+  }
 });
 
 router.get("/events", async (req, res) => {

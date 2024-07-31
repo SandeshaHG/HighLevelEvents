@@ -19,6 +19,7 @@
     "cors": "^2.8.5",
     "express": "^4.19.2",
     "firebase": "^10.12.4",
+    "luxon": "^3.4.4",
     "moment-timezone": "^0.5.45",
     "vue-datepicker-next": "^1.0.3",
     "vuejs-datepicker": "^1.6.2"

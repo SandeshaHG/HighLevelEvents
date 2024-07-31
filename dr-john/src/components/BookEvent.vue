@@ -124,6 +124,7 @@ const store = useStore();
 const timezone = computed(() => store.getters.getSelectedTimezone);
 
 const onValueChange = (e) => {
+  console.log("selected date", e.value);
   selectedDate.value = e.value;
 };
 
@@ -179,6 +180,23 @@ const addNewEvent = async (slot) => {
 
     if (userInput.trim() === "" || isNaN(userInput)) {
       alert("You must enter a valid duration");
+      return;
+    }
+    const end = momentWithTimezone.add(userInput, "minutes");
+    const johnStartTime = moment.tz(
+      `${momentWithTimezone.format("YYYY-MM-DD")} ${johnStart.value}`,
+      johnTimezone.value
+    );
+    const johnEndTime = moment.tz(
+      `${momentWithTimezone.format("YYYY-MM-DD")} ${johnEnd.value}`,
+      johnTimezone.value
+    );
+
+    if (
+      momentWithTimezone.isBefore(johnStartTime) ||
+      end.isAfter(johnEndTime)
+    ) {
+      alert("Dr John is out of office at the selected slot");
       return;
     }
     await axios.post(

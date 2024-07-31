@@ -43,21 +43,19 @@
               </div>
               <button @click="fetchEvents">Fetch Events</button>
             </div>
-            <div
-              v-for="(timestamps, date) in events"
-              :key="date"
-              class="date-container"
-            >
-              <div class="date-header">
-                <h4>{{ date }}</h4>
-              </div>
-              <div class="timestamps-container">
-                <span
-                  v-for="time in timestamps"
-                  :key="time"
-                  class="booked-slot"
-                  >{{ time }}</span
-                >
+            <div class="container">
+              <div v-for="(timestamps, date) in events" :key="date">
+                <div class="date-header">
+                  <h4>{{ date }}</h4>
+                </div>
+                <div class="timestamps-container">
+                  <span
+                    v-for="time in timestamps"
+                    :key="time"
+                    class="booked-slot"
+                    >{{ time }}</span
+                  >
+                </div>
               </div>
             </div>
             <div v-if="showBookedSlots && Object.keys(events).length == 0">
@@ -245,5 +243,15 @@ watch([selectedTimezone, slots], fetchEvents);
   flex-direction: column;
   justify-content: center;
   align-items: center;
+}
+
+.timestamps-container {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-around;
+  align-items: center;
+  background-color: #f9f9f9;
+  border-radius: 10px;
 }
 </style>

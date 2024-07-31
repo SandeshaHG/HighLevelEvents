@@ -167,14 +167,6 @@ const addNewEvent = async (slot) => {
     const timezoneStr = timezone.value;
     const momentWithTimezone = moment.tz(slot, "YYYY-MM-DD HH:mm", timezoneStr);
     const timeStampUTC = momentWithTimezone.utc().valueOf();
-
-    // Logging for debugging
-    console.log("timeStampUTC:", timeStampUTC);
-    console.log("slot:", slot);
-    console.log("timezoneStr:", timezoneStr);
-    console.log("Moment Object:", momentWithTimezone.format()); // Local time in timezone
-    console.log("UTC Moment Object:", momentWithTimezone.utc().format()); // UTC time
-
     const userInput = window.prompt(
       `Are you sure you want to add this event on ${moment(slot).format(
         "DD-MM-YYYY hh:mm A"
@@ -195,8 +187,12 @@ const addNewEvent = async (slot) => {
       )}`
     );
   } catch (error) {
-    console.error("Error adding new event:", error);
+    if (error.response && error.response.status === 422) {
+      alert("The slot you're looking for is unavailable");
+    }
+    console.error(error);
   }
+
   fetchFreeSlots();
 };
 

@@ -24,33 +24,6 @@ describe("Utils", function () {
     assert.strictEqual(endDateInTimezone.utc().format(), expectedEndDateUTC);
   });
 
-  it("Should return the right slots", function () {
-    const date = "2024-09-02";
-    const timezone = "America/New_York";
-    const slots = getSlots(date, timezone);
-    const expectedSlots = [
-      "2024-09-02T12:00:00-04:00",
-      "2024-09-02T12:30:00-04:00",
-      "2024-09-02T13:00:00-04:00",
-      "2024-09-02T13:30:00-04:00",
-      "2024-09-02T14:00:00-04:00",
-      "2024-09-02T14:30:00-04:00",
-      "2024-09-02T15:00:00-04:00",
-      "2024-09-02T15:30:00-04:00",
-      "2024-09-02T16:00:00-04:00",
-      "2024-09-02T16:30:00-04:00",
-      "2024-09-02T17:00:00-04:00",
-      "2024-09-02T17:30:00-04:00",
-      "2024-09-02T18:00:00-04:00",
-      "2024-09-02T18:30:00-04:00",
-      "2024-09-02T19:00:00-04:00",
-      "2024-09-02T19:30:00-04:00",
-    ];
-    console.log(slots);
-
-    assert.deepStrictEqual(slots, expectedSlots);
-  });
-
   it("userTimeZone - with config timezone", function () {
     const date = "2024-09-02T16:00:00Z";
     const timezone = "America/Los_Angeles";

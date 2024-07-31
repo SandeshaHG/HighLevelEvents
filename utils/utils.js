@@ -26,7 +26,6 @@ const flattenSlots = (slots) => {
 };
 
 const slotExists = (currentTimestamp, existingSlots, slotDuration = 30) => {
-  console.log("slotDuration", slotDuration);
   const currentStart = moment(Number(currentTimestamp));
   const currentEnd = moment(Number(currentTimestamp)).add(
     slotDuration,
@@ -58,7 +57,6 @@ const getSlots = (date, timezone, existingSlots = []) => {
       existingSlots,
       slotDuration
     );
-    console.log("notBooked", notBooked);
     if (notBooked) {
       slots.push(current.tz(timezone).format("YYYY-MM-DD HH:mm"));
     }

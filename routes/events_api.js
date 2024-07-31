@@ -65,6 +65,7 @@ router.get("/events", async (req, res) => {
     const endTimestamp = endDate.valueOf();
 
     const existingSlots = await getEvents();
+    // res.json(existingSlots);
 
     const filteredData = existingSlots.filter((item) => {
       const itemDate = moment(item.id, "YYYY-MM-DD").valueOf();
@@ -80,21 +81,34 @@ router.get("/events", async (req, res) => {
 
 router.post("/add_event", async (req, res) => {
   try {
-    const { timestamp } = req.query;
+    const { timestamp, duration } = req.query;
     if (!timestamp || isNaN(timestamp)) {
       return res.status(400).send("Invalid timestamp");
     }
 
-    const timestampSec = timestamp / 1000;
+    const timestampSec = Number(timestamp) / 1000;
     const dateTime = moment.unix(timestampSec).utc();
     const formattedDate = dateTime.format("YYYY-MM-DD");
     const existingSlots = await getEvents();
-
-    const isAvailable = slotExists(timestamp, existingSlots, config.DURATION);
+    let durationVal = duration || config.DURATION;
+    const isAvailable = slotExists(
+      timestamp,
+      existingSlots,
+      durationVal || config.DURATION
+    );
+    let timestampVal = timestampSec;
     if (!isAvailable) {
-      return res.status(422).send("This slot is unavailable");
+      return res.status(422).send("The slot you're looking for is unavailable");
     }
-    await addEvent(formattedDate, timestamp);
+    while (durationVal > 0) {
+      if (durationVal < config.DURATION) {
+        await addEvent(formattedDate, timestampVal * 1000);
+        break;
+      }
+      await addEvent(formattedDate, timestampVal * 1000);
+      durationVal = durationVal - config.DURATION;
+      timestampVal += config.DURATION * 60;
+    }
     const responseMessage = `Appointment successfully booked`;
     res.send(responseMessage);
   } catch (e) {

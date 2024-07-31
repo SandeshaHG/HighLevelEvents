@@ -26,11 +26,17 @@ const flattenSlots = (slots) => {
 };
 
 const slotExists = (currentTimestamp, existingSlots, slotDuration = 30) => {
+  console.log("slotDuration", slotDuration);
   const currentStart = moment(Number(currentTimestamp));
   const currentEnd = moment(Number(currentTimestamp)).add(
     slotDuration,
     "minutes"
   );
+  const startHours = moment(config.Start_HOURS, "HH:mm");
+  const endHours = moment(config.End_HOURS, "HH:mm");
+  if (currentStart.isBefore(startHours) || currentEnd.isAfter(endHours)) {
+    return true;
+  }
   const timestamps = flattenSlots(existingSlots);
 
   return !timestamps.some((slot) => {
@@ -67,8 +73,8 @@ const formattedDates = (data) => {
     return {
       id: item?.id,
       timestamp: item?.timestamp?.map((ts) => {
-        const date = new Date(ts.seconds * 1000 + ts.nanoseconds / 1000000);
-        return moment(date).format("YYYY-MM-DD h:mm A");
+        const date = moment.utc(ts.seconds * 1000 + ts.nanoseconds / 1000000);
+        return date.format("YYYY-MM-DD h:mm A");
       }),
     };
   });

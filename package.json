@@ -13,9 +13,12 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "cors": "^2.8.5",
     "express": "^4.19.2",
     "firebase": "^10.12.4",
-    "moment-timezone": "^0.5.45"
+    "moment-timezone": "^0.5.45",
+    "vue-datepicker-next": "^1.0.3",
+    "vuejs-datepicker": "^1.6.2"
   },
   "devDependencies": {
     "chai": "^5.1.1",

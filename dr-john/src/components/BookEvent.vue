@@ -182,7 +182,7 @@ const addNewEvent = async (slot) => {
       alert("You must enter a valid duration");
       return;
     }
-    const end = momentWithTimezone.add(userInput, "minutes");
+    const end = momentWithTimezone.add(userInput - 1, "minutes");
     const johnStartTime = moment.tz(
       `${momentWithTimezone.format("YYYY-MM-DD")} ${johnStart.value}`,
       johnTimezone.value
